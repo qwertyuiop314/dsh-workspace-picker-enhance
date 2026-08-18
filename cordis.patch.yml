@@ -1,0 +1,10 @@
+# dsh-workspace-picker-enhance bundle patch: mounts the enhanced workspace
+# directory browser into the DSH profile. The host half adds the
+# /plugins/workspace-picker-enhance/* HTTP routes; the web client registers a
+# higher-priority occupant for the existing workspace directory-flow slots.
+#
+# This patch only inserts this plugin. It does not modify any DSH core file or
+# the original directory-picker-browse plugin source.
+- insert:
+    - id: workspace-picker-enhance
+      name: dsh-workspace-picker-enhance
