@@ -72,6 +72,14 @@ The original directory picker UI is restored after uninstall and restart.
 - Inaccessible directories are only visually marked and click-blocked; the plugin never tries to bypass OS permissions
 - System directories are only warnings; users can still enter and inspect them, and decide whether to select them
 - Host routes are namespaced under `/plugins/workspace-picker-enhance/*` and do not conflict with other plugins
+- The file-enumeration endpoints include a basic loopback / same-origin check; do not expose DSH Web to untrusted networks or the public internet. If exposure is required, add authentication at a reverse proxy layer.
+
+## Known limitations
+
+- Very large directories (e.g. `/usr`) return at most 1000 entries per request; extra entries are marked `truncated: true` and are not paginated yet
+- On Windows, directory permission detection via `fs.access` is best-effort; the 🔒 indicator may be less precise than on POSIX
+- Hidden directories are shown but visually dimmed, so folders like `.config` remain selectable
+- Symlinks pointing to themselves or an ancestor are marked as a directory loop and blocked, preventing infinite navigation
 
 ## How it works
 

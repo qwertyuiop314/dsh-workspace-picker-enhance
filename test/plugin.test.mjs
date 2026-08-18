@@ -35,7 +35,10 @@ async function callRoute(routes, pathname, query) {
   assert.ok(handler, `route ${pathname} should be registered`)
   let status
   let body
-  const req = { url: pathname + (query ? '?' + new URLSearchParams(query) : '') }
+  const req = {
+    url: pathname + (query ? '?' + new URLSearchParams(query) : ''),
+    socket: { remoteAddress: '127.0.0.1' },
+  }
   const res = {
     writeHead(code) { status = code },
     end(text) { body = JSON.parse(text) },
@@ -74,6 +77,8 @@ test('list returns directory metadata with permission and system flags', async (
     assert.equal(entry.type, 'directory')
     assert.equal(typeof entry.readable, 'boolean')
     assert.equal(typeof entry.system, 'boolean')
+    assert.equal(typeof entry.hidden, 'boolean')
+    assert.equal(typeof entry.loop, 'boolean')
   }
   const etc = body.entries.find((e) => e.name === 'etc')
   if (etc) {
@@ -81,11 +86,30 @@ test('list returns directory metadata with permission and system flags', async (
   }
 })
 
-test('list returns error for a missing path', async () => {
+test('list returns 404 for a missing path', async () => {
   const routes = makeCtx()
   const { status, body } = await callRoute(routes, '/plugins/workspace-picker-enhance/list', { path: '/definitely-not-a-real-dsh-test-path-12345' })
-  assert.equal(status, 500)
+  assert.equal(status, 404)
   assert.ok(body.error)
+})
+
+test('routes reject non-loopback requests without same-origin header', async () => {
+  const routes = makeCtx()
+  const handler = routes.get('/plugins/workspace-picker-enhance/roots')
+  let status
+  let body
+  const req = {
+    url: '/plugins/workspace-picker-enhance/roots',
+    socket: { remoteAddress: '192.168.1.20' },
+    headers: {},
+  }
+  const res = {
+    writeHead(code) { status = code },
+    end(text) { body = JSON.parse(text) },
+  }
+  await handler(req, res)
+  assert.equal(status, 403)
+  assert.equal(body.error, 'forbidden')
 })
 
 test('client file exists and contains required registration points', () => {

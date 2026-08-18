@@ -129,6 +129,7 @@ The original directory picker UI is restored after uninstall and restart.
 - 无权限目录仅做视觉提示与点击拦截，不会尝试绕过系统权限
 - 系统目录仅做警告提示，仍保留“可进入查看”的能力；是否选择由用户自行决定
 - Host 路由固定为 `/plugins/workspace-picker-enhance/*`，不占用其它插件命名空间
+- 文件枚举接口带有基本的同源/回环地址校验；请勿将 DSH Web 暴露到不可信网络或公网，若必须暴露，请在反向代理层增加鉴权
 
 ### English
 
@@ -136,6 +137,7 @@ The original directory picker UI is restored after uninstall and restart.
 - Inaccessible directories are only visually marked and click-blocked; the plugin never tries to bypass OS permissions
 - System directories are only warnings; users can still enter and inspect them, and decide whether to select them
 - Host routes are namespaced under `/plugins/workspace-picker-enhance/*` and do not conflict with other plugins
+- The file-enumeration endpoints include a basic loopback / same-origin check; do not expose DSH Web to untrusted networks or the public internet. If exposure is required, add authentication at a reverse proxy layer.
 
 ---
 
@@ -147,6 +149,24 @@ The original directory picker UI is restored after uninstall and restart.
 | Browser UI | `lib/client.js` | Discovered by `dsh-client-modules` via `dsh.client.platform: web`; registers to `conversation.hero.workspace.directoryFlow` and `sidebar.workspaces.directoryFlow` with `priority: -1` to shadow the original picker |
 
 `cordis.patch.yml` is the bundle patch layer: it inserts the `workspace-picker-enhance` row when the bundle is listed in the profile.
+
+---
+
+## 已知限制 / Known limitations
+
+### 中文
+
+- 超大目录（如 `/usr`）单次最多返回 1000 条，超出部分会标记 `truncated: true`，不会自动分页
+- Windows 下 `fs.access` 对目录权限的判断是尽力而为，🔒 无权限提示可能不如 POSIX 精确
+- 隐藏目录会显示但视觉弱化（半透明），方便选择 `.config` 这类目录
+- 符号链接指向自身或祖先目录时会被标记为“目录循环”并阻止进入，避免无限深入
+
+### English
+
+- Very large directories (e.g. `/usr`) return at most 1000 entries per request; extra entries are marked `truncated: true` and are not paginated yet
+- On Windows, directory permission detection via `fs.access` is best-effort; the 🔒 indicator may be less precise than on POSIX
+- Hidden directories are shown but visually dimmed, so folders like `.config` remain selectable
+- Symlinks pointing to themselves or an ancestor are marked as a directory loop and blocked, preventing infinite navigation
 
 ---
 
