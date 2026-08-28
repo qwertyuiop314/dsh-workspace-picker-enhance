@@ -1,6 +1,6 @@
 {
   "name": "dsh-workspace-picker-enhance",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Enhanced DSH workspace directory picker: cross-drive/root browsing, breadcrumb jumps, and risk/permission visual indicators",
   "type": "module",
   "main": "lib/index.js",
