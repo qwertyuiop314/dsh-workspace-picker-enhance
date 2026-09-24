@@ -63,14 +63,15 @@ This plugin enhances the DSH "Select Workspace" directory picker through the off
 
 ## 版本兼容 / Compatibility
 
-已针对 DSH **0.1.7** 复核，**无需改动即兼容**（同时兼容 0.1.5）：
+已针对 DSH **0.1.7** 复核（同时兼容 0.1.5）：宿主与 slot 契约原样可用，客户端图标导出需要一处适配。
 
 - 宿主路由 `webServer.register({ kind: 'exact', path, handler(req, res) })` 契约未变（`WebRoute`）。
 - 客户端 `conversation.hero.workspace.directoryFlow` / `sidebar.workspaces.directoryFlow` 仍是 `single` slot，owner props 仍是 `open` / `busy` / `onPicked` / `onCancel`（0.1.7 另加 `onError`，本插件不使用）。
 - 抢占官方 directory-flow occupant 仍靠 `priority: -1`：0.1.7 的 slot 规则只拒绝**相同** priority 的重复注册，且渲染取 priority 最小者，因此本插件依旧是赢家。
 - `dsh.client.inject` 依赖的 `@deepseek-ai/dsh-client-*` 包在 0.1.7 中同名存在。
+- **图标导出已改名（硬断点）**：`@deepseek-ai/dsh-client-ui-primitives` 的图标从像素尺寸后缀（`IconFolderOpen16` / `IconChevronUpOutline14` …）改成了描边粗细后缀（`…Regular` / `…Medium`）。客户端半包现在两代都探（`primitives[modern] ?? primitives[legacy]`）；旧写法在新版会解构成 `undefined`，React 报 **error #130**、slot 崩溃，**界面上只是“没反应”而不报错**。
 
-English: verified against DSH 0.1.7 with no code change required — the host `WebRoute` contract, both directory-flow single slots, the `priority: -1` override rule, and the injected client package names are all unchanged.
+English: verified against DSH 0.1.7 — the host `WebRoute` contract, both directory-flow single slots and the `priority: -1` override rule are unchanged; the client half needed one adaptation because `ui-primitives` renamed its icon exports from pixel suffixes (`…16`/`…14`) to stroke-weight suffixes (`…Regular`/`…Medium`). The bundle now resolves either generation at runtime, so one build works on 0.1.5 and 0.1.7+.
 
 ## 安装 / Install
 
