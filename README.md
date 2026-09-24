@@ -61,6 +61,17 @@ This plugin enhances the DSH "Select Workspace" directory picker through the off
 
 ---
 
+## 版本兼容 / Compatibility
+
+已针对 DSH **0.1.7** 复核，**无需改动即兼容**（同时兼容 0.1.5）：
+
+- 宿主路由 `webServer.register({ kind: 'exact', path, handler(req, res) })` 契约未变（`WebRoute`）。
+- 客户端 `conversation.hero.workspace.directoryFlow` / `sidebar.workspaces.directoryFlow` 仍是 `single` slot，owner props 仍是 `open` / `busy` / `onPicked` / `onCancel`（0.1.7 另加 `onError`，本插件不使用）。
+- 抢占官方 directory-flow occupant 仍靠 `priority: -1`：0.1.7 的 slot 规则只拒绝**相同** priority 的重复注册，且渲染取 priority 最小者，因此本插件依旧是赢家。
+- `dsh.client.inject` 依赖的 `@deepseek-ai/dsh-client-*` 包在 0.1.7 中同名存在。
+
+English: verified against DSH 0.1.7 with no code change required — the host `WebRoute` contract, both directory-flow single slots, the `priority: -1` override rule, and the injected client package names are all unchanged.
+
 ## 安装 / Install
 
 > ⚠️ 当前插件仍在测试阶段。请先在隔离沙盒、模拟环境或 DSH 测试实例中完整验证，再部署到生产环境或公开发布。

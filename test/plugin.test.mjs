@@ -68,9 +68,11 @@ test('roots returns platform, separator and at least the POSIX root on linux/dar
 
 test('list returns directory metadata with permission and system flags', async () => {
   const routes = makeCtx()
-  const { status, body } = await callRoute(routes, '/plugins/workspace-picker-enhance/list', { path: '/' })
+  // The browsable root of the host: '/' on POSIX, the current drive on Windows.
+  const root = process.platform === 'win32' ? path.parse(process.cwd()).root : '/'
+  const { status, body } = await callRoute(routes, '/plugins/workspace-picker-enhance/list', { path: root })
   assert.equal(status, 200)
-  assert.equal(body.path, '/')
+  assert.equal(body.path, path.resolve(root))
   assert.ok(Array.isArray(body.crumbs))
   assert.ok(Array.isArray(body.entries))
   for (const entry of body.entries) {
